@@ -1,3 +1,20 @@
+/* flex */
+.flex{
+  display: flex;
+}
+
+.spaceAround{
+  justify-content: space-around;
+  align-items: flex-start;
+}
+
+/* DIV CHAT */
+
+.chatcontainer{
+  width: 80%;
+  margin: 0 auto;
+}
+
 /* Chat containers */
 .container {
     border: 2px solid #dedede;

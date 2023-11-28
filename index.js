@@ -19,16 +19,15 @@ httpServer.listen(9000, () => { console.log(`http://localhost:9000`); });
 let users = [];
 const io = new Server(httpServer);
 io.on('connection', (socket) => {
-    console.log('nouveau !!!');
-
+    //console.log('nouveau !!!');
     socket.on('client:user:pseudo', (user) => {
         if (users.includes(user)) {
-            console.log('ici');
-            socket.emit('server:user:exist')
+            socket.emit('server:user:exist');
         } else {
-            users.push(user)
-            socket.emit('server:user:connected')
+            users.push(user);
+            socket.emit('server:user:connected');
+            io.emit('server:users:connectedlist', users);
+            console.table(users);
         }
-        console.table(users);
     })
 });
