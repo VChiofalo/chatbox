@@ -25,7 +25,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     socket.on('server:user:exist', () => connectByPseudo(true));
     socket.on('server:user:connected', () => {
-        console.log(':D');
         connectToChat();
     });
 })
