@@ -3,8 +3,10 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const socket = io.connect(document.location.host);
 
-    let btnCo = document.querySelector('#button_connexion');
-    let chat = document.querySelector('#chat');
+    let btnCo = document.querySelector('#btnConnect');
+    let btnDco = document.querySelector('#btnDisconnect');
+    let notAuth = document.querySelectorAll('.not_authenticated');
+    let auth = document.querySelectorAll('.authenticated');
 
     function connectByPseudo(exists){
         if (exists) {
@@ -16,30 +18,47 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    function connectToChat(){
-        chat.classList.remove('invisible');
-        btnCo.classList.add('invisible');
+    function connectChat(){
+        auth.forEach(element => {
+            element.classList.remove('hide');
+        });
+        notAuth.forEach(element => {
+            element.classList.add('hide');
+        });
         window.alert('Vous êtes maintenant connecté au chat !');
+    }
+
+    function disconnectChat() {
+        auth.forEach(element =>{
+            element.classList.add('hide');
+        });
+        notAuth.forEach(element => {
+            element.classList.remove('hide');
+        })
+        socket.emit('client:user:disconnect');
     }
     
     btnCo.addEventListener('click', () => connectByPseudo(false));
     
     socket.on('server:user:exist', () => connectByPseudo(true));
+
     socket.on('server:user:connected', () => {
-        connectToChat();
+        connectChat();
     });
+
     socket.on('server:users:connectedlist', (users) =>{  
         console.log(users);
-        document.querySelector('ul').innerHTML = '';
+        document.querySelector('#listingUsers').innerHTML = '';
         if ("content" in document.createElement('template')) {
-            let template = document.querySelector('#usersrow');
+            let template = document.querySelector('#usersTpl');
             users.forEach(user => {
                 let clone = template.content.cloneNode(true);
-                let li = clone.querySelector('li');
-                li.textContent = user; 
-
-                document.querySelector('ul').appendChild(clone);
+                clone.querySelector("li").textContent = user
+                document.querySelector('#listingUsers').appendChild(clone);
             });
         }
     });
+
+    btnDco.addEventListener('click', disconnectChat);
+
 })

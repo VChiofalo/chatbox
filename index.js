@@ -25,9 +25,14 @@ io.on('connection', (socket) => {
             socket.emit('server:user:exist');
         } else {
             users.push(user);
+            socket.user = user;
             socket.emit('server:user:connected');
             io.emit('server:users:connectedlist', users);
-            console.table(users);
         }
+    })
+
+    socket.on('client:user:disconnect', ()=>{
+        users.splice(users.indexOf(socket.user), 1);
+        io.emit('server:users:connectedlist', users);
     })
 });
