@@ -1,7 +1,7 @@
 import User from './User.js';
 import Message from './Message.js'
 import Channel from './Channel.js'
-import { Server, Socket } from "socket.io";
+import { Server, Socket } from 'socket.io';
 
 export default class Chat {
     constructor(httpServer){
@@ -23,7 +23,7 @@ export default class Chat {
 
             socket.on('client:message:send', this.onMessageSend.bind(this, socket));
 
-            socket.on("disconnect", this.onUserDisconnect.bind(this, socket));
+            socket.on('disconnect', this.onUserDisconnect.bind(this, socket));
 
             socket.on('client:channel:switch',  this.onSwitchChannel.bind(this, socket))
         })

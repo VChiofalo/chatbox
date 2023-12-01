@@ -7,9 +7,9 @@ export default class UserInterface{
 
     listenInterface(){
         // gestionnaire d'événement au clic afin de connecter l'utilisateur
-        document.querySelector("#btnConnect").addEventListener('click',() => this.tryConnect(false));
+        document.querySelector('#btnConnect').addEventListener('click',() => this.tryConnect(false));
         // gestionnaire d'événement au clic afin de déconnecter l'utilisateur
-        document.querySelector("#btnDisconnect").addEventListener('click', () => { this.tryDisconnect() });
+        document.querySelector('#btnDisconnect').addEventListener('click', () => { this.tryDisconnect() });
         // gestionnaire d'événement lors de l'appuie sur la touche entrer
         document.querySelector('#createMessage').addEventListener('keydown', this.sendingMessage);
     }
@@ -19,9 +19,9 @@ export default class UserInterface{
             alert(`Ce pseudo est déjà utilisé par un autre utilisateur !`);
         }
         let pseudo = window.prompt(`Choisissez un pseuso :`);
-        if(pseudo !== null && pseudo !== "") {
+        if(pseudo !== null && pseudo !== '') {
             // création d'un custom event
-            const event = new CustomEvent("local:user:connect", { detail: { pseudo } });
+            const event = new CustomEvent('local:user:connect', { detail: { pseudo } });
             // diffusion de l'événement au travers du document
             document.dispatchEvent(event);
         }
@@ -29,7 +29,7 @@ export default class UserInterface{
 
     tryDisconnect() {
         // création d'un custom event
-        const event = new CustomEvent("local:user:disconnect");
+        const event = new CustomEvent('local:user:disconnect');
         // diffusion de l'événement au travers du document
         document.dispatchEvent(event);
     }
@@ -60,37 +60,38 @@ export default class UserInterface{
     listingUsers(users){
         // insert les utilisateurs dans une liste à partir d'un template html
         document.querySelector('#listingUsers').innerHTML = '';
-        if ("content" in document.createElement("template")) {
-            let template = document.querySelector("#usersTpl");
+        if ('content' in document.createElement('template')) {
+            let template = document.querySelector('#usersTpl');
             users.forEach((user) => {
                 let clone = document.importNode(template.content, true);
-                clone.querySelector("li").textContent = user;
+                clone.querySelector('li').textContent = user;
                 document.querySelector('#listingUsers').appendChild(clone);
             })
         }
     }
 
-    sendingMessage(event, pseudo){
+    sendingMessage(event){
         if (event.keyCode == 13) {
             let userMessage = document.querySelector('#createMessage').value;
-            if(userMessage !== "") {
+            if(userMessage !== '') {
                 // création d'un custom event
-                const event = new CustomEvent("local:message:send", { detail: { userMessage } });
+                const event = new CustomEvent('local:message:send', { detail: { userMessage } });
                 // diffusion de l'événement au travers du document
                 document.dispatchEvent(event);
                 document.querySelector('#createMessage').value = '';
             }  
         } else {
+            console.log(users);
             // création d'un custom event
-            const event = new CustomEvent("local:message:typing", { detail: { pseudo } });
+            const event = new CustomEvent('local:message:typing');
             // diffusion de l'événement au travers du document
             document.dispatchEvent(event);
         }
     }
 
     addMessage(userMessage){
-        if ("content" in document.createElement("template")) {
-            let template = document.querySelector("#messagesTpl");
+        if ('content' in document.createElement('template')) {
+            let template = document.querySelector('#messagesTpl');
             let clone = document.importNode(template.content, true);
             clone.querySelector('td.time').textContent = userMessage.date + ' - ';
             clone.querySelector('td.author').textContent = userMessage.user + ' :';
@@ -101,8 +102,8 @@ export default class UserInterface{
 
     listingChannels(channels){
         document.querySelector('#listingChannels').innerHTML = '';
-        if ("content" in document.createElement("template")) {
-            let template = document.querySelector("#channelsTpl");
+        if ('content' in document.createElement('template')) {
+            let template = document.querySelector('#channelsTpl');
             channels.forEach((channel) => {
                 let clone = document.importNode(template.content, true);
                 clone.querySelector('li').textContent = channel;
