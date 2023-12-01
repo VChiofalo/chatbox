@@ -1,64 +1,58 @@
-import { io } from "https://cdn.socket.io/4.4.1/socket.io.esm.min.js";
-document.addEventListener('DOMContentLoaded', () => {
-    
-    const socket = io.connect(document.location.host);
+import Chat from './Chat.js'
+import UserInterface from "./UserInterface.js";
+const chat = new Chat(new UserInterface())
 
-    let btnCo = document.querySelector('#btnConnect');
-    let btnDco = document.querySelector('#btnDisconnect');
-    let notAuth = document.querySelectorAll('.not_authenticated');
-    let auth = document.querySelectorAll('.authenticated');
+/* const socket = io.connect(document.location.host); */
 
-    function connectByPseudo(exists){
-        if (exists) {
-            window.alert('Pseudo déjà attribué à un autre utilisateur !');
-        };
-        let user = window.prompt('Choisissez un pseudo : ');
-        if (user !== null && user !== '') {
-            socket.emit('client:user:pseudo', user);
-        };
+/* function tryConnect(exists) {
+    if(exists) { 
+        alert(`Ce pseudo est déjà utilisé par un autre utilisateur !`)
     }
-
-    function connectChat(){
-        auth.forEach(element => {
-            element.classList.remove('hide');
-        });
-        notAuth.forEach(element => {
-            element.classList.add('hide');
-        });
-        window.alert('Vous êtes maintenant connecté au chat !');
+    let pseudo = window.prompt(`Choisissez un pseuso :`);
+    if(pseudo !== null && pseudo !== "") {
+        socket.emit('client:user:connect', pseudo)
     }
+} */
 
-    function disconnectChat() {
-        auth.forEach(element =>{
-            element.classList.add('hide');
-        });
-        notAuth.forEach(element => {
-            element.classList.remove('hide');
-        })
-        socket.emit('client:user:disconnect');
-    }
-    
-    btnCo.addEventListener('click', () => connectByPseudo(false));
-    
-    socket.on('server:user:exist', () => connectByPseudo(true));
+/* function tryDisconnect() {
+    socket.emit('client:user:disconnect')
+} */
 
-    socket.on('server:user:connected', () => {
-        connectChat();
-    });
+/* document.addEventListener('DOMContentLoaded', () => {
+    document.querySelector("#btnConnect").addEventListener('click',() => tryConnect(false));
 
-    socket.on('server:users:connectedlist', (users) =>{  
-        console.log(users);
-        document.querySelector('#listingUsers').innerHTML = '';
-        if ("content" in document.createElement('template')) {
-            let template = document.querySelector('#usersTpl');
-            users.forEach(user => {
-                let clone = template.content.cloneNode(true);
-                clone.querySelector("li").textContent = user
-                document.querySelector('#listingUsers').appendChild(clone);
-            });
-        }
-    });
+    document.querySelector("#btnDisconnect").addEventListener('click', () => { tryDisconnect(); })
+}) */
 
-    btnDco.addEventListener('click', disconnectChat);
-
+/* socket.on('server:user:exists', () => { tryConnect(true) })
+socket.on('server:user:connected', () => {  
+    // afficher l'interface du chat et masquer le bouton de connexion
+    document.querySelectorAll('.not_authenticated').forEach((element) => {
+        element.classList.add('hide')
+    }) 
+    document.querySelectorAll('.authenticated').forEach((element) => {
+        element.classList.remove('hide')
+    }) 
 })
+
+socket.on('server:user:disconnected', () => {  
+    // masquer l'interface du chat et afficher le bouton de connexion
+    document.querySelectorAll('.not_authenticated').forEach((element) => {
+        element.classList.remove('hide')
+    }) 
+    document.querySelectorAll('.authenticated').forEach((element) => {
+        element.classList.add('hide')
+    }) 
+})
+
+socket.on('server:user:list', (users) => {
+    document.querySelector('#listingUsers').innerHTML = '';
+    if ("content" in document.createElement("template")) {
+        let template = document.querySelector("#usersTpl");
+        users.forEach((user) => {
+            let clone = document.importNode(template.content, true);
+            clone.querySelector("li").textContent = user
+            document.querySelector('#listingUsers').appendChild(clone);
+        })
+    }
+}) */
