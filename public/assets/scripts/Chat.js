@@ -8,12 +8,10 @@ export default class Chat{
 
     listenWebSocketServer(){
         this.socket.on('server:user:exists', () => { this.ui.tryConnect(true) });
-        this.socket.on('server:user:connected', this.ui.connecting);
+        this.socket.on('server:user:connected', this.ui.connecting.bind(this.ui));
         this.socket.on('server:user:disconnected', this.ui.disconnecting);
         this.socket.on('server:user:list', this.ui.listingUsers);
-        this.socket.on('server:message:send', this.sendingMessage);
-        this.socket.on('server:message:list', this.ui.listingMessages);
-        this.socket.on('server:channel:list', this.ui.listingChannels);
+        this.socket.on('server:message:new', this.ui.addMessage);
     }
 
     listenLocalEvent(){
@@ -27,6 +25,10 @@ export default class Chat{
 
         document.addEventListener('local:message:send', (e) =>{
             this.socket.emit('client:message:send', e.detail.userMessage);
+        })
+
+        document.addEventListener("local:channel:switch", (e) => {
+            this.socket.emit("client:channel:switch", e.detail.channel)
         })
     }
 }

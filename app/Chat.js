@@ -6,8 +6,8 @@ import { Server, Socket } from "socket.io";
 export default class Chat {
     constructor(httpServer){
         this.users = [];
-        this.messages = [];
         this.channels = [new Channel('Général'), new Channel('Programmation'),new Channel('Jeux Vidéo')];
+        this.channels.attribut = [];
         this.io = new Server(httpServer);
 
         this.onConnect();
@@ -24,6 +24,8 @@ export default class Chat {
             socket.on('client:message:send', this.onMessageSend.bind(this, socket));
 
             socket.on("disconnect", this.onUserDisconnect.bind(this, socket));
+
+            socket.on('client:channel:switch',  this.onSwitchChannel.bind(this, socket))
         })
     }
 
@@ -32,40 +34,42 @@ export default class Chat {
         if (searchUser.length > 0) {
             socket.emit('server:user:exists');
         } else {
-            socket.join('Général');
             let user = new User(pseudo);
-            user.setChannel('Général')
             this.users.push(user);
             socket.user = user;
-            socket.emit('server:user:connected', user.getChannel());
+            this.onSwitchChannel(socket, 'Général');
+            socket.emit('server:user:connected', this.getChannelsList());
             this.io.emit('server:user:list', this.getUsersList());
-            this.io.emit('server:channel:list', this.getChannelsList());
         }
     }
 
     onUserDisconnect(socket){
-        this.users.splice(this.users.findIndex((user) => user.pseudo == socket.user.pseudo),1);
+        let indexUser = this.users.findIndex((user) => user.pseudo == socket.user.pseudo);
+        if (indexUser) {
+            this.users.splice(indexUser,1);  
+        }
         socket.emit('server:user:disconnected');
         this.io.emit('server:user:list', this.getUsersList());
     }
 
     onMessageSend(socket, userMessage){
-        let message = new Message(userMessage, socket.user.pseudo);
-        this.messages.push(message);
-        socket.message = message;
-        socket.emit('server:message:send');
-        this.io.emit('server:message:list', this.getMessagesList());
+        const message = new Message(userMessage, socket.user.pseudo);
+        this.io.emit('server:message:new', message);
+    }
+
+    onSwitchChannel(socket, channel) {
+        socket.join(channel);
+        socket.user.setChannel(channel);
     }
 
     getUsersList() {
         return this.users.map(user => user.pseudo);
     }
 
-    getMessagesList() {
-        return this.messages;
+    getChannelsList(){
+        return this.channels.map(channel => channel.name);
     }
 
-    getChannelsList(){
-        return this.channels.map(channel => channel.name)
+    getMessagesList(socket){
     }
 }

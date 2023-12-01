@@ -5,6 +5,15 @@ export default class UserInterface{
         })
     }
 
+    listenInterface(){
+        // gestionnaire d'événement au clic afin de connecter l'utilisateur
+        document.querySelector("#btnConnect").addEventListener('click',() => this.tryConnect(false));
+        // gestionnaire d'événement au clic afin de déconnecter l'utilisateur
+        document.querySelector("#btnDisconnect").addEventListener('click', () => { this.tryDisconnect(); })
+        // gestionnaire d'événement lors de l'appuie sur la touche entrer
+        document.querySelector('#createMessage').addEventListener('keydown', this.sendingMessage);
+    }
+
     tryConnect(exists) {
         if(exists) { 
             alert(`Ce pseudo est déjà utilisé par un autre utilisateur !`)
@@ -25,26 +34,10 @@ export default class UserInterface{
         document.dispatchEvent(event);
     }
 
-    listenInterface(){
-        // gestionnaire d'événement au clic afin de connecter l'utilisateur
-        document.querySelector("#btnConnect").addEventListener('click',() => this.tryConnect(false));
-        // gestionnaire d'événement au clic afin de déconnecter l'utilisateur
-        document.querySelector("#btnDisconnect").addEventListener('click', () => { this.tryDisconnect(); })
-        // gestionnaire d'événement lors de la fermeture de la page afin de déconnecter l'utilisateur
-        // /window.addEventListener("beforeunload", () => { this.tryDisconnect(); })
-        // gestionnaire d'événement lors de l'appuie sur la touche entrer
-        document.querySelector('#createMessage').addEventListener('keydown', (e) =>{
-            if (e.isComposing || e.keyCode === 13) {
-                this.sendingMessage();
-            }
-        })
+    connecting(channels){
+        // afficher la liste des channels
+        this.listingChannels(channels)
 
-        document.querySelectorAll('#messagesTpl td').forEach(() =>{
-            this.swapRoom();
-        })
-    }
-
-    connecting(channel){
         // afficher l'interface du chat et masquer le bouton de connexion
         document.querySelectorAll('.not_authenticated').forEach((element) => {
             element.classList.add('hide')
@@ -52,8 +45,6 @@ export default class UserInterface{
         document.querySelectorAll('.authenticated').forEach((element) => {
             element.classList.remove('hide')
         })
-        alert('Vous êtes maintenant connecté au salon ' + channel);
-        listingMessages();
     }
 
     disconnecting(){  
@@ -79,50 +70,54 @@ export default class UserInterface{
         }
     }
 
-    sendingMessage(){
-        let userMessage = document.querySelector('#createMessage').value;
-        if(userMessage !== null && userMessage !== "") {
-            // création d'un custom event
-            const event = new CustomEvent("local:message:send", { detail: { userMessage } });
-            // diffusion de l'événement au travers du document
-            document.dispatchEvent(event);
+    sendingMessage(event){
+        if (event.keyCode == 13) {
+            let userMessage = document.querySelector('#createMessage').value;
+            if(userMessage !== "") {
+                // création d'un custom event
+                const event = new CustomEvent("local:message:send", { detail: { userMessage } });
+                // diffusion de l'événement au travers du document
+                document.dispatchEvent(event);
+                document.querySelector('#createMessage').value = '';
+            }  
         }
     }
 
-    listingMessages(userMessages, pseudo){
-        document.querySelector('#listingMessages').innerHTML = '';
+    addMessage(userMessage){
+        // /document.querySelector('#listingMessages').innerHTML = '';
         if ("content" in document.createElement("template")) {
             let template = document.querySelector("#messagesTpl");
-            userMessages.forEach((userMessage) => {
-                let clone = document.importNode(template.content, true);
-                clone.querySelector('.time').textContent = userMessage.date + ' - ';
-                clone.querySelector('.author').textContent = userMessage.user + ' :';
-                clone.querySelector('.message').textContent = ' '+ userMessage.message;
-                document.querySelector('#listingMessages').appendChild(clone);
-            })
-        document.querySelector('#createMessage').value = '';
+            let clone = document.importNode(template.content, true);
+            clone.querySelector('td.time').textContent = userMessage.date + ' - ';
+            clone.querySelector('td.author').textContent = userMessage.user + ' :';
+            clone.querySelector('td.message').textContent = ' '+ userMessage.message;
+            document.querySelector('#listingMessages').appendChild(clone);
         }
     }
 
     listingChannels(channels){
-        console.log(channels);
         document.querySelector('#listingChannels').innerHTML = '';
         if ("content" in document.createElement("template")) {
             let template = document.querySelector("#channelsTpl");
             channels.forEach((channel) => {
                 let clone = document.importNode(template.content, true);
                 clone.querySelector('li').textContent = channel;
+                clone.querySelector('li').addEventListener('click', this.switchChannel)
                 document.querySelector('#listingChannels').appendChild(clone);
             })
-
         }
+        document.querySelector('#listingChannels li').classList.add('active');
     }
 
-    swapRoom(){
-        console.log('coucou');
-        // création d'un custom event
-        const event = new CustomEvent("local:room:switch", console.log({ detail: { chan } }));
-        // diffusion de l'événement au travers du document
+    displayMessage(){
+        
+    }
+
+    switchChannel (e) {
+        let li = e.currentTarget;
+        const event = new CustomEvent('local:channel:switch', { detail: { channel : li.textContent} });
         document.dispatchEvent(event);
+        document.querySelector('#listingChannels li.active').classList.remove('active');
+        li.classList.add('active');
     }
 }
