@@ -1,14 +1,10 @@
 export default class Channel{
     constructor(name){
         this.name = name;
-        this.attribut;
+        this.messages = [];
     }
 
-    setAttribut(attribut){
-        this.attribut = attribut;
-    }
-
-    getAttribut(){
-        return this.attribut;
+    setMessage(message){
+        this.messages.push(message);
     }
 }

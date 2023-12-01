@@ -12,6 +12,7 @@ export default class Chat{
         this.socket.on('server:user:disconnected', this.ui.disconnecting);
         this.socket.on('server:user:list', this.ui.listingUsers);
         this.socket.on('server:message:new', this.ui.addMessage);
+        this.socket.on('server:message:list', this.ui.listingMessages.bind(this.ui))
     }
 
     listenLocalEvent(){
@@ -27,8 +28,12 @@ export default class Chat{
             this.socket.emit('client:message:send', e.detail.userMessage);
         })
 
-        document.addEventListener("local:channel:switch", (e) => {
-            this.socket.emit("client:channel:switch", e.detail.channel)
+        document.addEventListener('local:channel:switch', (e) => {
+            this.socket.emit('client:channel:switch', e.detail.channel);
+        })
+
+        document.addEventListener('local:channel:typing', (e) => {
+            this.socket.emit('typing', e.detail.pseudo);
         })
     }
 }

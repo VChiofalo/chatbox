@@ -1,6 +1,6 @@
 import Chat from './Chat.js'
 import UserInterface from "./UserInterface.js";
-const chat = new Chat(new UserInterface())
+const chat = new Chat(new UserInterface());
 
 /* const socket = io.connect(document.location.host); */
 

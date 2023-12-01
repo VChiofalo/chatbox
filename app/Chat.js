@@ -54,12 +54,14 @@ export default class Chat {
 
     onMessageSend(socket, userMessage){
         const message = new Message(userMessage, socket.user.pseudo);
+        this.getCurrentChannel(socket).setMessage(message);
         this.io.emit('server:message:new', message);
     }
 
     onSwitchChannel(socket, channel) {
         socket.join(channel);
         socket.user.setChannel(channel);
+        socket.emit('server:message:list', this.getMessagesList(socket));
     }
 
     getUsersList() {
@@ -71,5 +73,11 @@ export default class Chat {
     }
 
     getMessagesList(socket){
+        return this.getCurrentChannel(socket).messages;
+    }
+
+    getCurrentChannel(socket){
+        let currentChannel = this.channels.findIndex((channel) => channel.name == socket.user.channel);
+        return this.channels[currentChannel];
     }
 }
